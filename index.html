@@ -19,6 +19,8 @@ input,select,textarea{background:#0b0b0d;color:var(--text);border:1px solid var(
 <header><h1>Neurowaxx Flowgen · Song Workspace</h1>
 <div class="row"><input id="key" type="password" placeholder="Gemini API key (stored only in this browser)" style="width:280px"><button id="saveKey">Save key</button><button id="clearKey">Forget key</button><span id="keyState" class="dim"></span></div></header>
 <main><div>
+<div class="panel"><h2>Songs</h2><div class="row"><select id="songSel" style="flex:1"></select><button id="newSong">New</button><button id="renSong">Rename</button><button id="delSong">Delete</button></div>
+<div class="row" style="margin-top:6px"><input id="seed" style="flex:1" placeholder="Seed phrase"></div><div class="row" style="margin-top:6px"><textarea id="notes" rows="2" style="flex:1" placeholder="Theme notes (sent to the AI)"></textarea></div></div>
 <div class="panel"><div class="row" style="justify-content:space-between"><h2>Suno output</h2><span id="chars" class="dim"></span></div>
 <div class="row"><button class="pri" id="copySuno">Copy for Suno</button><button id="copyStyle">Copy style tags</button><label class="dim"><input type="checkbox" id="styleIn"> style tag in lyrics</label>
 <button id="export">Export JSON</button><label><button onclick="document.getElementById('imp').click()">Import JSON</button></label><input type="file" id="imp" accept=".json" hidden><button id="reset">Reset to starter</button></div>
@@ -37,4 +39,4 @@ input,select,textarea{background:#0b0b0d;color:var(--text);border:1px solid var(
 <div class="dim">Writer / judge. Defaults: gemini-pro-latest. Use gemini-2.5-flash if Pro quota runs out.</div></div>
 <div class="panel"><h2>Bars bank</h2><div id="bank"></div></div>
 </div></main>
-<script src="data.js"></script><script src="app.js"></script></body></html>
+<script src="data.js"></script><script src="songs.js"></script><script src="app.js"></script></body></html>
