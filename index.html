@@ -21,6 +21,14 @@ input,select,textarea{background:#0b0b0d;color:var(--text);border:1px solid var(
 <main><div>
 <div class="panel"><h2>Songs</h2><div class="row"><select id="songSel" style="flex:1"></select><button id="newSong">New</button><button id="renSong">Rename</button><button id="delSong">Delete</button></div>
 <div class="row" style="margin-top:6px"><input id="seed" style="flex:1" placeholder="Seed phrase"></div><div class="row" style="margin-top:6px"><textarea id="notes" rows="2" style="flex:1" placeholder="Theme notes (sent to the AI)"></textarea></div></div>
+<div class="panel" id="writer"><h2>Line-by-line writer</h2>
+<div class="row"><input id="wIn" style="flex:1" placeholder="Type a word, phrase or bar, then Generate next line"><select id="wMode"><option value="auto">Auto</option><option value="local">Local (no key)</option></select><button class="pri" id="wGo">Generate next line</button></div>
+<div class="row" id="wSeeds" style="margin-top:6px"></div>
+<div class="row" style="margin-top:8px"><textarea id="wOut" rows="2" style="flex:1" placeholder="Generated line appears here — edit it freely"></textarea></div>
+<div class="row" style="margin-top:6px"><button class="pri" id="wAccept">Accept</button><button id="wAcceptGo">Accept + next</button><button id="wRegen">Regenerate</button><button id="wUndo">Undo last line</button><span id="wStatus" class="dim"></span></div>
+<div id="wInfo" class="dim" style="margin-top:6px"></div>
+<h2 style="margin-top:12px">Running verse</h2><div id="wVerse"></div>
+<div class="row" style="margin-top:6px"><button id="wCopy">Copy verse</button><button id="wExport">Export .txt</button><button id="wToSong">Add to song as section</button><button id="wClear">Clear</button></div></div>
 <div class="panel"><div class="row" style="justify-content:space-between"><h2>Suno output</h2><span id="chars" class="dim"></span></div>
 <div class="row"><button class="pri" id="copySuno">Copy for Suno</button><button id="copyStyle">Copy style tags</button><label class="dim"><input type="checkbox" id="styleIn"> style tag in lyrics</label>
 <button id="export">Export JSON</button><label><button onclick="document.getElementById('imp').click()">Import JSON</button></label><input type="file" id="imp" accept=".json" hidden><button id="reset">Reset to starter</button></div>
@@ -39,4 +47,4 @@ input,select,textarea{background:#0b0b0d;color:var(--text);border:1px solid var(
 <div class="dim">Writer / judge. Defaults: gemini-pro-latest. Use gemini-2.5-flash if Pro quota runs out.</div></div>
 <div class="panel"><h2>Bars bank</h2><div id="bank"></div></div>
 </div></main>
-<script src="data.js"></script><script src="songs.js"></script><script src="app.js"></script></body></html>
+<script src="data.js"></script><script src="songs.js"></script><script src="app.js"></script><script src="rhymedict.js"></script><script src="writer.js"></script></body></html>
