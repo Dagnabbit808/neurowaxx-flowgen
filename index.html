@@ -1,0 +1,40 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Neurowaxx Flowgen</title>
+<style>
+:root{--bg:#0e0e10;--panel:#17171b;--line:#2a2a31;--text:#ececf1;--dim:#9a9aa6;--acc:#e0303a;--ok:#3fb67a;--warn:#e0a030}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,sans-serif}
+header{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+h1{font-size:18px;margin:0}h2{font-size:15px;margin:0 0 8px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;padding:16px}@media(max-width:900px){main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+button{background:#25252c;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:5px 9px;cursor:pointer;font:inherit;font-size:13px}
+button:hover{border-color:var(--dim)}button.pri{background:var(--acc);border-color:var(--acc)}button:disabled{opacity:.4;cursor:default}
+input,select,textarea{background:#0b0b0d;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.sec{border-top:1px solid var(--line);padding-top:10px;margin-top:10px}
+.ln{display:flex;gap:6px;align-items:center;margin:4px 0}.ln input[type=text]{flex:1;min-width:0}.num{width:48px;color:var(--dim);font-size:12px}
+.dim{color:var(--dim);font-size:12px}.cand{border:1px solid var(--line);border-radius:10px;padding:10px;margin:8px 0}.cand.fail{opacity:.6}
+.chip{display:inline-flex;gap:4px;align-items:center;background:#25252c;border-radius:999px;padding:2px 8px;font-size:12px;margin:2px}
+.chip b{cursor:pointer}.bad{color:var(--acc)}.good{color:var(--ok)}pre{white-space:pre-wrap}
+</style></head><body>
+<header><h1>Neurowaxx Flowgen · Song Workspace</h1>
+<div class="row"><input id="key" type="password" placeholder="Gemini API key (stored only in this browser)" style="width:280px"><button id="saveKey">Save key</button><button id="clearKey">Forget key</button><span id="keyState" class="dim"></span></div></header>
+<main><div>
+<div class="panel"><div class="row" style="justify-content:space-between"><h2>Suno output</h2><span id="chars" class="dim"></span></div>
+<div class="row"><button class="pri" id="copySuno">Copy for Suno</button><button id="copyStyle">Copy style tags</button><label class="dim"><input type="checkbox" id="styleIn"> style tag in lyrics</label>
+<button id="export">Export JSON</button><label><button onclick="document.getElementById('imp').click()">Import JSON</button></label><input type="file" id="imp" accept=".json" hidden><button id="reset">Reset to starter</button></div>
+<div class="row" style="margin-top:8px"><input id="style" style="flex:1" placeholder="Style tags for Suno"></div></div>
+<div class="panel"><h2>Song</h2><div id="song"></div>
+<div class="row" style="margin-top:12px"><select id="newTag"></select><button id="addSec">+ Section</button></div></div>
+</div><div>
+<div class="panel"><h2>AI picks</h2><div id="status" class="dim">Pick an AI action on a section or line.</div><div id="cands"></div></div>
+<div class="panel"><h2>Style mix</h2>
+<div class="row">DOOM <input type="range" id="wD" min="0" max="100" style="flex:1"> <span id="wDv"></span></div>
+<div class="row">Sonnyjim <input type="range" id="wS" min="0" max="100" style="flex:1"> <span id="wSv"></span></div>
+<div class="row" id="types"></div>
+<div class="row" style="margin-top:6px"><select id="pinSel" style="flex:1"></select></div><div id="pins"></div>
+<h2 style="margin-top:12px">Mute list</h2><div id="mutes"></div><div class="row"><input id="muteIn" placeholder="add word, Enter" style="flex:1"></div>
+<h2 style="margin-top:12px">Models</h2><div class="row"><input id="genModel" style="flex:1"><input id="judgeModel" style="flex:1"></div>
+<div class="dim">Writer / judge. Defaults: gemini-pro-latest. Use gemini-2.5-flash if Pro quota runs out.</div></div>
+<div class="panel"><h2>Bars bank</h2><div id="bank"></div></div>
+</div></main>
+<script src="data.js"></script><script src="app.js"></script></body></html>
