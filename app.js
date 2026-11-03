@@ -45,7 +45,21 @@ window.wpick=wpick;
 function assignments(k){const p=pool();if(!p.length)return[];const gx=p.filter(x=>x.genx),ar=p.filter(x=>!x.genx);const out=[];
  for(let i=0;i<k;i++){let a;if(S.set.pins.length){const l=S.set.pins[i%S.set.pins.length];const n=D.nodes.find(n=>n[1]===l)||D.genx.find(g=>g[0]===l)||D.lux.find(g=>g[0]===l)||(D.pro||[]).find(g=>g[0]===l)||(D.shr||[]).find(g=>g[0]===l);a={label:l,gloss:n?(n[4]||n[1]):""}}else a=gx.length&&Math.random()<.25?wpick(gx):wpick(p);const b=ar.length?wpick(ar):wpick(p);out.push({anchor:a.label+" — "+a.gloss,artist_node:b.label+" — "+b.gloss})}return out}
 // ---------- Gemini
-async function gemini(model,prompt,temp){const key=localStorage.getItem("fg_key");if(!key)throw new Error("Add your Gemini key first (top right).");
+const CLAUDE_MODEL="claude-sonnet-5-5";
+function provider(){const p=localStorage.getItem("fg_provider"),c=!!localStorage.getItem("fg_ckey"),g=!!localStorage.getItem("fg_key");if(p==="gemini"||p==="claude")return p;return c?"claude":g?"gemini":"claude"}
+window.provider=provider;window.hasLLMKey=()=>!!localStorage.getItem(provider()==="claude"?"fg_ckey":"fg_key");
+function parseJ(t){const m=t.match(/\[[\s\S]*\]/);try{return JSON.parse(m?m[0]:t)}catch(e){throw new Error("Model returned non-JSON: "+t.slice(0,150))}}
+// all generation + both judges + ranking go through here; routes to the selected provider
+async function gemini(model,prompt,temp){return provider()==="claude"?claude(prompt,temp):geminiCall(model,prompt,temp)}
+async function claude(prompt,temp){const key=localStorage.getItem("fg_ckey");if(!key)throw new Error("Add your Claude key first (top right).");
+ for(let a=0;a<5;a++){let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:S.set.claudeModel||CLAUDE_MODEL,max_tokens:8000,messages:[{role:"user",content:prompt+"\n\nRespond with ONLY the JSON array, no prose, no code fences."}]})})}catch(e){throw new Error("Claude: network/CORS error, request blocked before reaching Anthropic ("+e.message+")")}
+  if(r.status===429||r.status===529||r.status>=500){status(`Claude busy/rate limited (${r.status}), retrying…`);await new Promise(z=>setTimeout(z,4000*2**a));continue}
+  if(r.status===401)throw new Error("Claude 401: bad or revoked API key. Paste a valid key (top right).");
+  if(r.status===403)throw new Error("Claude 403: key lacks permission or billing/credits issue.");
+  if(!r.ok)throw new Error(`Claude ${r.status}: ${(await r.text()).slice(0,200)}`);
+  const j=await r.json();return parseJ((j.content||[]).filter(b=>b.type==="text").map(b=>b.text).join(""))}
+ throw new Error("Claude rate limit: try again in a minute.")}
+async function geminiCall(model,prompt,temp){const key=localStorage.getItem("fg_key");if(!key)throw new Error("Add your Gemini key first (top right).");
  for(let a=0;a<5;a++){const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:temp,responseMimeType:"application/json"}})});
   if(r.status===429||r.status>=500){status(`Rate limited (${r.status}), retrying…`);await new Promise(z=>setTimeout(z,4000*2**a));continue}
   if(!r.ok)throw new Error(`Gemini ${r.status}: ${(await r.text()).slice(0,200)}`);
@@ -133,6 +147,8 @@ $("muteIn").onkeydown=e=>{if(e.key==="Enter"&&e.target.value.trim()){S.set.mutes
 $("export").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(plain(),null,1)],{type:"application/json"}));a.download=(S.name||"song").replace(/\W+/g,"_")+".json";a.click()};
 $("imp").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());const id="s"+Date.now();LIB.songs[id]={...START,...j,name:j.name||f.name.replace(/\.json$/,"")};switchTo(id)}catch(x){alert("Bad file")}};
 $("reset").onclick=()=>{const base=S.name===(LIFE_START||{}).name?LIFE_START:S.name===(PROPH_START||{}).name?PROPH_START:S.name===(SHRINK_START||{}).name?SHRINK_START:START;if(confirm("Replace this song with its starter draft?")){S=hydrate(base);render()}};
-const ks=()=>$("keyState").textContent=localStorage.getItem("fg_key")?"key saved in this browser":"no key";
-$("saveKey").onclick=()=>{const v=$("key").value.trim();if(v){localStorage.setItem("fg_key",v);$("key").value="";ks()}};$("clearKey").onclick=()=>{localStorage.removeItem("fg_key");ks()};
+const kslot=()=>$("prov").value==="claude"?"fg_ckey":"fg_key";
+const ks=()=>{const p=provider(),on=!!localStorage.getItem(p==="claude"?"fg_ckey":"fg_key");$("prov").value=p;$("key").placeholder=(p==="claude"?"Claude (Anthropic)":"Gemini")+" API key (stored only in this browser)";const e=$("keyState");e.textContent=on?"key active: "+(p==="claude"?"Claude":"Gemini"):"no "+(p==="claude"?"Claude":"Gemini")+" key";e.style.color=on?"#4c4":"#c90"};
+$("prov").onchange=()=>{localStorage.setItem("fg_provider",$("prov").value);ks();const ev=new Event("click");$("saveKey").dispatchEvent(ev)};
+$("saveKey").onclick=()=>{const v=$("key").value.trim();if(v){localStorage.setItem(kslot(),v);localStorage.setItem("fg_provider",$("prov").value);$("key").value=""}ks()};$("clearKey").onclick=()=>{localStorage.removeItem(kslot());ks()};
 ks();render();

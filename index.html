@@ -17,12 +17,12 @@ input,select,textarea{background:#0b0b0d;color:var(--text);border:1px solid var(
 .chip b{cursor:pointer}.bad{color:var(--acc)}.good{color:var(--ok)}pre{white-space:pre-wrap}
 </style></head><body>
 <header><h1>Neurowaxx Flowgen · Song Workspace</h1>
-<div class="row"><input id="key" type="password" placeholder="Gemini API key (stored only in this browser)" style="width:280px"><button id="saveKey">Save key</button><button id="clearKey">Forget key</button><span id="keyState" class="dim"></span></div></header>
+<div class="row"><select id="prov" title="LLM provider"><option value="claude">Claude</option><option value="gemini">Gemini</option></select><input id="key" type="password" placeholder="Gemini API key (stored only in this browser)" style="width:280px"><button id="saveKey">Save key</button><button id="clearKey">Forget key</button><span id="keyState" class="dim"></span></div></header>
 <main><div>
 <div class="panel"><h2>Songs</h2><div class="row"><select id="songSel" style="flex:1"></select><button id="newSong">New</button><button id="renSong">Rename</button><button id="delSong">Delete</button></div>
 <div class="row" style="margin-top:6px"><input id="seed" style="flex:1" placeholder="Seed phrase"></div><div class="row" style="margin-top:6px"><textarea id="notes" rows="2" style="flex:1" placeholder="Theme notes (sent to the AI)"></textarea></div></div>
 <div class="panel" id="writer"><h2>Line-by-line writer</h2>
-<div id="wKeyNote" class="dim" style="display:none;margin:4px 0;padding:6px;border:1px solid #c90">The line writer runs on Gemini: paste your key in the box at top right to get real, judged bars. Without a key, only the rough "Local sketch" mode works.</div><div class="row"><input id="wIn" style="flex:1" placeholder="Type a word, phrase or bar, then Generate next line"><select id="wMode"><option value="auto">Auto</option><option value="local">Local sketch (no key, rough)</option></select><button class="pri" id="wGo">Generate next line</button></div>
+<div id="wKeyNote" class="dim" style="display:none;margin:4px 0;padding:6px;border:1px solid #c90">The line writer runs on Claude or Gemini (pick at top right): paste that key in the box at top right to get real, judged bars. Without a key, only the rough "Local sketch" mode works.</div><div class="row"><input id="wIn" style="flex:1" placeholder="Type a word, phrase or bar, then Generate next line"><select id="wMode"><option value="auto">Auto</option><option value="local">Local sketch (no key, rough)</option></select><button class="pri" id="wGo">Generate next line</button></div>
 <div class="row" id="wSeeds" style="margin-top:6px"></div>
 <div class="row" style="margin-top:8px"><textarea id="wOut" rows="2" style="flex:1" placeholder="Generated line appears here — edit it freely"></textarea></div>
 <div class="row" style="margin-top:6px"><button class="pri" id="wAccept">Accept</button><button id="wAcceptGo">Accept + next</button><button id="wRegen">Regenerate</button><button id="wUndo">Undo last line</button><span id="wStatus" class="dim"></span></div>
@@ -44,7 +44,7 @@ input,select,textarea{background:#0b0b0d;color:var(--text);border:1px solid var(
 <div class="row" style="margin-top:6px"><select id="pinSel" style="flex:1"></select></div><div id="pins"></div>
 <h2 style="margin-top:12px">Mute list</h2><div id="mutes"></div><div class="row"><input id="muteIn" placeholder="add word, Enter" style="flex:1"></div>
 <h2 style="margin-top:12px">Models</h2><div class="row"><input id="genModel" style="flex:1"><input id="judgeModel" style="flex:1"></div>
-<div class="dim">Writer / judge. Defaults: gemini-pro-latest. Use gemini-2.5-flash if Pro quota runs out.</div></div>
+<div class="dim">Writer / judge. Gemini defaults: gemini-pro-latest. Claude uses claude-sonnet-5-5 for writer and both judges. Use gemini-2.5-flash if Pro quota runs out.</div></div>
 <div class="panel"><h2>Bars bank</h2><div id="bank"></div></div>
 </div></main>
 <script src="data.js"></script><script src="songs.js"></script><script src="app.js"></script><script src="rhymedict.js"></script><script src="writer.js"></script></body></html>

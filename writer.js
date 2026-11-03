@@ -91,13 +91,13 @@ function localRound(prev){const G=gvocab();const rec=new Set(tplRecent()),used=n
   const stock=!T_OPEN.includes(c.o)+!T_CLOSE.includes(c.c),rep=rec.has(c.o)+rec.has(c.c);
   c.score=avg(c.j)-(c.flags.length?3:0)-stock*.6-rep*2+c.fills.length*.4+Math.random()*.5;if(!c.flags.length&&!passJ(c.j))c.flags.push("heuristic below 4: "+fails(c.j))}return C}
 async function generate(){const inp=W$("wIn").value.trim();if(inp&&inp!==V()[V().length-1]){V().push(inp);WS.hist.push({op:"add"})}W$("wIn").value="";WS.input="";
- const prev=ctxPrev();if(!prev){wstat("Type a word or phrase first.");return render2()}const hasKey=!!localStorage.getItem("fg_key"),useLLM=hasKey&&W$("wMode").value!=="local";if(!hasKey&&W$("wMode").value!=="local"){wstat("⚠ Add your Gemini key (top right) for real lines that rhyme and pass both judges. Or pick \"Local sketch\" for rough no-key bars.");const kn=W$("wKeyNote");if(kn)kn.style.display="";if(prev===inp){V().pop();WS.hist.pop();W$("wIn").value=inp}return render2()}
+ const prev=ctxPrev();if(!prev){wstat("Type a word or phrase first.");return render2()}const hasKey=window.hasLLMKey(),useLLM=hasKey&&W$("wMode").value!=="local";if(!hasKey&&W$("wMode").value!=="local"){wstat("⚠ Add your "+(window.provider()==="claude"?"Claude":"Gemini")+" key (top right) for real lines that rhyme and pass both judges. Or pick \"Local sketch\" for rough no-key bars.");const kn=W$("wKeyNote");if(kn)kn.style.display="";if(prev===inp){V().pop();WS.hist.pop();W$("wIn").value=inp}return render2()}
  W$("wGo").disabled=true;let C=[],tries=0;
  try{while(tries<2){tries++;wstat(useLLM?`Writing 8 candidates with ${S.set.gen} (try ${tries})…`:"Generating locally from the node graph…");
    const R=useLLM?await llmRound(prev):localRound(prev);C=C.concat(R);if(R.some(c=>!c.flags.length))break}
  }catch(e){wstat("⚠ "+e.message+(C.length?"":" — falling back to local generator"));if(!C.length)C=localRound(prev)}
- W$("wGo").disabled=false;const kf=c=>(c.flags.length?0:100)+c.score-c.flags.length;C.sort((a,b)=>kf(b)-kf(a));const best=C[0];if(!best&&!useLLM)wstat(`No-key mode has no half-bar that truly rhymes with "${ew(prev)}". Add a Gemini key, or edit the last word.`);
- if(best&&!useLLM)tplUse(best);const lp=!useLLM&&best&&best.flags.length;if(lp)wstat(`No-key sketch found nothing that rhymes (perfect or CMU-verified) and fits under 22 syllables. Closest rejects are below. Add a Gemini key for real lines.`);WS.out=best&&!lp?best.text:"";WS.last={mode:useLLM?"LLM":"local",best,rej:C.filter(c=>c!==best).slice(0,useLLM?16:10),pass:best&&!best.flags.length,n:C.length,tries};wsave();render2()}
+ W$("wGo").disabled=false;const kf=c=>(c.flags.length?0:100)+c.score-c.flags.length;C.sort((a,b)=>kf(b)-kf(a));const best=C[0];if(!best&&!useLLM)wstat(`No-key mode has no half-bar that truly rhymes with "${ew(prev)}". Add an API key, or edit the last word.`);
+ if(best&&!useLLM)tplUse(best);const lp=!useLLM&&best&&best.flags.length;if(lp)wstat(`No-key sketch found nothing that rhymes (perfect or CMU-verified) and fits under 22 syllables. Closest rejects are below. Add an API key for real lines.`);WS.out=best&&!lp?best.text:"";WS.last={mode:useLLM?"LLM":"local",best,rej:C.filter(c=>c!==best).slice(0,useLLM?16:10),pass:best&&!best.flags.length,n:C.length,tries};wsave();render2()}
 function accept(){const t=W$("wOut").value.trim();if(!t)return;V().push(t);WS.hist.push({op:"add"});WS.out="";WS.last=null;wsave();render2()}
 function undo(){if(V().length){WS.hist.push({op:"undo",text:V().pop()});wsave();render2()}}
 function render2(){const host=W$("writer");if(!host)return;W$("wIn").value=WS.input||W$("wIn").value;W$("wOut").value=WS.out||"";
@@ -116,7 +116,7 @@ function init(){W$("wGo").onclick=generate;W$("wRegen").onclick=()=>{WS.out="";g
  W$("wClear").onclick=()=>{if(confirm("Clear the running verse?")){WS.verse=[];WS.out="";WS.last=null;wsave();render2()}};
  W$("wIn").oninput=e=>{WS.input=e.target.value;wsave()};W$("wOut").oninput=e=>{WS.out=e.target.value;wsave()};
  W$("wIn").onkeydown=e=>{if(e.key==="Enter")generate()};
- const ms=()=>{W$("wMode").options[0].text=localStorage.getItem("fg_key")?"LLM (Gemini, key saved)":"LLM (needs Gemini key)";const kn=W$("wKeyNote");if(kn)kn.style.display=localStorage.getItem("fg_key")?"none":""};ms();W$("saveKey").addEventListener("click",ms);W$("clearKey").addEventListener("click",ms);
+ const ms=()=>{const P=window.provider()==="claude"?"Claude":"Gemini",h=window.hasLLMKey();W$("wMode").options[0].text=h?`LLM (${P}, key saved)`:`LLM (needs ${P} key)`;const kn=W$("wKeyNote");if(kn)kn.style.display=h?"none":""};ms();W$("saveKey").addEventListener("click",ms);W$("clearKey").addEventListener("click",ms);
  const sw=W$("songSel");sw.addEventListener("change",()=>{load();render2()});load();render2()}
 window.FW={rhymeOk,localRound,mech,heur,ctx:()=>WS,generate,load};
 init();
