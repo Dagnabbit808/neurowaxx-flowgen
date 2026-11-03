@@ -16,7 +16,7 @@ input,select,textarea{background:#0b0b0d;color:var(--text);border:1px solid var(
 .chip{display:inline-flex;gap:4px;align-items:center;background:#25252c;border-radius:999px;padding:2px 8px;font-size:12px;margin:2px}
 .chip b{cursor:pointer}.bad{color:var(--acc)}.good{color:var(--ok)}pre{white-space:pre-wrap}
 </style></head><body>
-<header><h1>Neurowaxx Flowgen · Song Workspace</h1>
+<header><h1>Neurowaxx Flowgen · Song Workspace</h1><a href="classic.html" style="color:var(--dim)">Classic Phrase Generator →</a>
 <div class="row"><select id="prov" title="LLM provider"><option value="claude">Claude</option><option value="gemini">Gemini</option></select><input id="key" type="password" placeholder="Gemini API key (stored only in this browser)" style="width:280px"><button id="saveKey">Save key</button><button id="clearKey">Forget key</button><span id="keyState" class="dim"></span></div></header>
 <main><div>
 <div class="panel"><h2>Songs</h2><div class="row"><select id="songSel" style="flex:1"></select><button id="newSong">New</button><button id="renSong">Rename</button><button id="delSong">Delete</button></div>
@@ -47,4 +47,4 @@ input,select,textarea{background:#0b0b0d;color:var(--text);border:1px solid var(
 <div class="dim">Writer / judge. Gemini defaults: gemini-pro-latest. Claude uses claude-sonnet-5-5 for writer and both judges. Use gemini-2.5-flash if Pro quota runs out.</div></div>
 <div class="panel"><h2>Bars bank</h2><div id="bank"></div></div>
 </div></main>
-<script src="data.js"></script><script src="songs.js"></script><script src="app.js"></script><script src="rhymedict.js"></script><script src="writer.js"></script></body></html>
+<script src="data.js"></script><script src="songs.js"></script><script src="app.js"></script><script src="rhymedict.js"></script><script src="writer.js"></script><script>(()=>{const v=localStorage.getItem("flowgenSeedLine");if(v){localStorage.removeItem("flowgenSeedLine");const i=document.getElementById("wIn");if(i){i.value=v;i.focus();i.scrollIntoView({block:"center"});}}})();</script></body></html>
