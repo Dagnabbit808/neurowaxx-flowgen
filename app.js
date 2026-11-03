@@ -1,6 +1,6 @@
 const D=window.FG, $=id=>document.getElementById(id);
 const TAGS=["Intro","Verse 1","Verse 2","Verse 3","Pre-Chorus","Chorus","Bridge","Outro"];
-const TN={pop:"Pop refs",sla:"Slang",dou:"Double entendres",sub:"Subjects",tec:"Techniques",genx:"Gen X pack",lux:"Rich & Famous pack",pro:"Prophecy pack",shr:"Shrink pack"};
+const TN={pop:"Pop refs",sla:"Slang",dou:"Double entendres",ima:"Imagery motifs",obj:"Objects",sub:"Subjects",tec:"Techniques",genx:"Gen X pack",lux:"Rich & Famous pack",pro:"Prophecy pack",shr:"Shrink pack"};
 const BANK=["'89 state of mind, swap a gross rhyme like a Garbage Pail Kid / Flipped a ninety-nine cent charge to a blockbuster hit","Rock in the Walkman, rock in the sock / One play side A, the other one pay the rent on the block","Pac-Man on a diet, still chasin' every dot of the bag / The ghosts work for me now, they just wave the white flag","Bread on the table, bread in the Trapper Keeper / Velcro rip loud, so I count it in the sleeper","Ferris took a day off, I took the whole decade / Rang the school as my own dad, still got the grades paid","Waiting for the lunch lady to grab my collar and straight to the office escort me","Three-headed flow like King Ghidorah on a lunch break / Each head order separate, none of 'em share the crumb cake","Rémy in a teacup, pinky up, very formal / Nan thinks it's Earl Grey, so the family's still normal","Saw a Cabbage Patch doll, riding shotgun in a Benz / A strange sort of luxury, for imaginary friends","The unbothered villain order escargot in the grand dining room / Leave a two-pence copper tip, sealing the sommelier's DOOM","The cold Metal Face chew the Kobe beef with a rusted jaw / Sip the imported burgundy, ignoring the local health law","Swat a pesky fruit fly with the fringe of a Hermes tie / Ash the mahogany blunt in the teacup, let the embers die","Ash the spliff in an oyster shell, cooking loops in the kitchenette / Truffle oil on the drum machine, paying off a Michelin debt","Shorty poured out the imported weed on the back of a classical art degree / I'm sipping an oat milk flat white, charging a highly extortionate fee","Passed the spliff to a shellfish fiend in a crushed velvet blazer / Slicing up the calamari rings with a rusty cut-throat razor","Pour chilled Sancerre beneath a flickering strip mall neon sign / Grip the mic like an Atari joystick, an eight-bit state of mind"];
 const START={name:"Blockbuster Late Fee",seed:"Blockbuster late fee in '89",notes:"Gen X nostalgia, owing a late fee to a store that no longer exists; lunchbox nunchucks thread.",style:"boom bap, dusty soul sample, lo-fi, deadpan male rap, 90 bpm",styleIn:false,secs:[
 {tag:"Intro",lines:["Wax crackle, sip Margaux out a styrofoam chalice","Printed notice in the grip, still ignoring the balance"]},
@@ -8,7 +8,7 @@ const START={name:"Blockbuster Late Fee",seed:"Blockbuster late fee in '89",note
 {tag:"Chorus",lines:["Blockbuster late fee in '89, still ain't paid it","Store's gone, the debt's alive, I'm the one who outlasted","Blockbuster late fee since way back in '89","Plus an extra charge for VHS tapes I forgot to rewind"]},
 {tag:"Verse 2",lines:["Chop the leaf with the laminated blue and yellow plastic","Spark a Blockbuster-thick spliff, the ash is cinematic","That Trapper Keeper Velcro, a sound that always drew a stare","Like a muffled shotgun blast, echoing through the school air","Wash the truffle down with Tab soda, pink aluminum aesthetic","Loop the beat and leave it running, looking mildly apathetic","Maverick in the aviators, playing volleyball in denim","Eat the fugu fish at Nobu, hope there ain't a drop of venom"]},
 {tag:"Chorus",lines:["Blockbuster late fee in '89, still ain't paid it","Store's gone, the debt's alive, I'm the one who outlasted"]}],
-set:{wD:50,wS:50,types:["pop","sla","dou","sub","genx"],pins:[],mutes:["Doom","Villain","mask"],gen:"gemini-pro-latest",judge:"gemini-pro-latest"}};
+set:{wD:50,wS:50,types:["pop","sla","dou","ima","obj","sub","genx"],pins:[],mutes:["Doom","Villain","mask"],gen:"gemini-pro-latest",judge:"gemini-pro-latest"}};
 let uid=1;const mk=t=>({id:uid++,text:t,locked:false,sel:false});
 function hydrate(s){return{...s,secs:s.secs.map(x=>({id:uid++,tag:x.tag,lines:x.lines.map(l=>typeof l==="string"?mk(l):{...mk(l.text),locked:!!l.locked})}))}}
 const LIFE_START=window.LIFE_START;
@@ -18,10 +18,10 @@ if(!LIB||!LIB.songs){LIB={current:"s1",songs:{}};let old=null;try{old=JSON.parse
 if(LIFE_START&&!LIB.lifeAdded){if(!Object.values(LIB.songs).some(s=>s.name===LIFE_START.name))LIB.songs["s"+Date.now()]=LIFE_START;LIB.lifeAdded=1}
 const SHRINK_START=window.SHRINK_START;if(SHRINK_START&&!LIB.shrinkAdded){if(!Object.values(LIB.songs).some(s=>s.name===SHRINK_START.name)){const id="k"+Date.now();LIB.songs[id]=SHRINK_START;LIB.current=id}LIB.shrinkAdded=1}
 const PROPH_START=window.PROPH_START;if(PROPH_START&&!LIB.prophAdded){if(!Object.values(LIB.songs).some(s=>s.name===PROPH_START.name))LIB.songs["p"+Date.now()]=PROPH_START;LIB.prophAdded=1}
-let S=hydrate(LIB.songs[LIB.current]||Object.values(LIB.songs)[0]);S.set={...START.set,...(S.set||{})};
+let S=hydrate(LIB.songs[LIB.current]||Object.values(LIB.songs)[0]);S.set={...START.set,...(S.set||{})};function deepMig(){if(!S.set.deep2){S.set.types=[...new Set([...S.set.types,"ima","obj"])];S.set.deep2=1}}deepMig();
 const plain=()=>({name:S.name,seed:S.seed||"",notes:S.notes||"",style:S.style,styleIn:S.styleIn,set:S.set,secs:S.secs.map(s=>({tag:s.tag,lines:s.lines.map(l=>({text:l.text,locked:l.locked}))}))});
 const save=()=>{LIB.songs[LIB.current]=plain();localStorage.setItem("fg_library",JSON.stringify(LIB))};
-function switchTo(id){save();LIB.current=id;S=hydrate(LIB.songs[id]);S.set={...START.set,...(S.set||{})};$("cands").innerHTML="";render()}
+function switchTo(id){save();LIB.current=id;S=hydrate(LIB.songs[id]);S.set={...START.set,...(S.set||{})};deepMig();$("cands").innerHTML="";render()}
 // ---------- helpers
 const words=s=>(s.toLowerCase().match(/[a-z']+/g)||[]);
 const stem=w=>w.replace(/'/g,"").replace(/(ing|ed|es|s|z)$/,"");
@@ -36,9 +36,14 @@ const syl=s=>words(s).reduce((n,w)=>n+Math.max(1,(w.replace(/e$/,"").match(/[aei
 function pool(){const out=[];for(const n of D.nodes){if(!S.set.types.includes(n[0])||muted(n[1]))continue;const w=S.set.wD/100*n[2]/139+S.set.wS/100*n[3]/57;if(w>0)out.push({label:n[1],gloss:n[4],w})}
  if(S.set.types.includes("genx"))for(const [k,v] of D.genx)if(!muted(k))out.push({label:k,gloss:v,w:.08,genx:1});
  for(const t of ["lux","pro","shr"])if(S.set.types.includes(t))for(const [k,v] of (D[t]||[]))if(!muted(k))out.push({label:k,gloss:v,w:.1,genx:1});return out}
-function wpick(a){let r=Math.random()*a.reduce((x,y)=>x+y.w,0);for(const x of a){r-=x.w;if(r<=0)return x}return a[a.length-1]}
+// randomized sampling: sqrt weight-flattening over the full pool + no-repeat window (last 60 picks, persisted)
+const RECENT_N=60;let RECENT=[];try{RECENT=JSON.parse(localStorage.getItem("fg_recent"))||[]}catch(e){}
+function wpick(a,rec=true){if(!a.length)return undefined;const rs=new Set(RECENT);let c=a.filter(x=>!rs.has(x.label));if(!c.length)c=a;
+ const ws=c.map(x=>Math.sqrt(Math.max(x.w,1e-4)));let r=Math.random()*ws.reduce((x,y)=>x+y,0),pick=c[c.length-1];for(let i=0;i<c.length;i++){r-=ws[i];if(r<=0){pick=c[i];break}}
+ if(rec){RECENT.push(pick.label);if(RECENT.length>RECENT_N)RECENT=RECENT.slice(-RECENT_N);try{localStorage.setItem("fg_recent",JSON.stringify(RECENT))}catch(e){}}return pick}
+window.wpick=wpick;
 function assignments(k){const p=pool();if(!p.length)return[];const gx=p.filter(x=>x.genx),ar=p.filter(x=>!x.genx);const out=[];
- for(let i=0;i<k;i++){let a;if(S.set.pins.length){const l=S.set.pins[i%S.set.pins.length];const n=D.nodes.find(n=>n[1]===l)||D.genx.find(g=>g[0]===l)||D.lux.find(g=>g[0]===l)||(D.pro||[]).find(g=>g[0]===l)||(D.shr||[]).find(g=>g[0]===l);a={label:l,gloss:n?(n[4]||n[1]):""}}else a=gx.length&&Math.random()<.6?wpick(gx):wpick(p);const b=ar.length?wpick(ar):wpick(p);out.push({anchor:a.label+" — "+a.gloss,artist_node:b.label+" — "+b.gloss})}return out}
+ for(let i=0;i<k;i++){let a;if(S.set.pins.length){const l=S.set.pins[i%S.set.pins.length];const n=D.nodes.find(n=>n[1]===l)||D.genx.find(g=>g[0]===l)||D.lux.find(g=>g[0]===l)||(D.pro||[]).find(g=>g[0]===l)||(D.shr||[]).find(g=>g[0]===l);a={label:l,gloss:n?(n[4]||n[1]):""}}else a=gx.length&&Math.random()<.25?wpick(gx):wpick(p);const b=ar.length?wpick(ar):wpick(p);out.push({anchor:a.label+" — "+a.gloss,artist_node:b.label+" — "+b.gloss})}return out}
 // ---------- Gemini
 async function gemini(model,prompt,temp){const key=localStorage.getItem("fg_key");if(!key)throw new Error("Add your Gemini key first (top right).");
  for(let a=0;a<5;a++){const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:temp,responseMimeType:"application/json"}})});
